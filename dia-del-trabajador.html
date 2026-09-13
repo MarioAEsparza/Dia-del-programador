@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feliz día, developer</title>
+<meta name="description" content="Una página para celebrar el Día del Trabajador a los programadores.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a0d12;
+    --bg-1:#10141c;
+    --fg:#eef1f5;
+    --muted:#5c6577;
+    --mint:#7fe7c4;
+    --coral:#ff8f66;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    background:var(--bg-0);
+    color:var(--fg);
+    overflow:hidden;
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  #field{
+    position:fixed;
+    inset:0;
+    z-index:0;
+  }
+
+  #field span{
+    position:absolute;
+    top:0; 
+    left:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--muted);
+    font-size:13px;
+    font-weight:500;
+    white-space:nowrap;
+    transition:color .35s ease, text-shadow .35s ease;
+    will-change:transform, color;
+    user-select:none;
+    transform-origin: center;
+  }
+
+  #glow{
+    position:fixed;
+    top:0; left:0;
+    width:520px;
+    height:520px;
+    margin-left:-260px;
+    margin-top:-260px;
+    background:radial-gradient(circle, rgba(127,231,196,.10), rgba(255,143,102,.06) 45%, transparent 70%);
+    pointer-events:none;
+    z-index:1;
+    transition:opacity .3s ease;
+    opacity:0;
+  }
+
+  #hero{
+    position:relative;
+    z-index:2;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:32px;
+    pointer-events:none;
+  }
+
+  #hero .card{
+    pointer-events:auto;
+    background:rgba(255,255,255,.035);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:22px;
+    padding:56px 60px;
+    max-width:640px;
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+    transition:transform .35s ease, border-color .35s ease, box-shadow .35s ease, background .35s ease;
+  }
+
+  #hero .card:hover{
+    transform:translateY(-6px);
+    border-color:rgba(127,231,196,.4);
+    background:rgba(255,255,255,.05);
+    box-shadow:0 26px 60px rgba(0,0,0,.45), 0 0 40px rgba(127,231,196,.08);
+  }
+
+  #hero .comment{
+    color:var(--mint);
+    font-size:14px;
+    letter-spacing:.01em;
+    margin: 0 auto 18px;
+    opacity:.85;
+  }
+
+  #hero h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(2rem, 6vw, 4.2rem);
+    line-height:1.08;
+    max-width:16ch;
+    margin:0 auto;
+    color:var(--fg);
+  }
+
+  #hero h1 .accent{ color:var(--coral); }
+
+  #hero .sub{
+    margin: 22px auto 0;
+    color:var(--muted);
+    font-size:15px;
+    max-width:46ch;
+  }
+
+  #hero .sign{
+    position:fixed;
+    bottom:22px;
+    right:26px;
+    font-size:12px;
+    color:var(--muted);
+    z-index:2;
+  }
+
+  @media (max-width: 640px){
+    #field span{ font-size:10px; }
+    #hero .sub{ font-size:13px; }
+    #hero .card{ padding:36px 28px; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="field"></div>
+  <div id="glow"></div>
+
+  <main id="hero">
+    <div class="card">
+      <div class="comment">// para quienes resuelven bugs incluso en sueños</div>
+      <h1>Feliz día del <span class="accent">programador</span>.</h1>
+      <p class="sub">Por cada commit a medianoche, cada "funciona en mi máquina" y cada bug que sí resolviste. Hoy también es tu día.</p>
+    </div>
+  </main>
+
+  <div class="sign">— con cariño, tu equipo</div>
+
+<script>
+(function(){
+  const SNIPPETS = [
+    'función', 'variable', 'bucle', 'array', 'algoritmo', 'recursión',
+    'compilador', 'servidor', 'framework', 'backend', 'frontend', 'async',
+    'null', 'undefined', 'stack', 'queue', 'hash', 'boolean', 'string',
+    'objeto', 'clase', 'método', 'índice', 'caché', 'deploy', 'merge',
+    'branch', 'runtime', 'sintaxis', 'binario', 'byte', 'socket', 'query',
+    'thread', 'commit', 'debug', 'API', 'base de datos', 'kernel', 'loop'
+  ];
+
+  const field = document.getElementById('field');
+  const glow = document.getElementById('glow');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let particles = [];
+  const NUM_PARTICLES = 70; 
+
+  function buildField(){
+    field.innerHTML = '';
+    particles = [];
+    
+    for(let i = 0; i < NUM_PARTICLES; i++){
+      const el = document.createElement('span');
+      el.textContent = SNIPPETS[Math.floor(Math.random() * SNIPPETS.length)];
+      
+      const rot = (Math.random() * 20 - 10).toFixed(1);
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * window.innerHeight;
+      
+      // Aplicamos la posición inicial de inmediato para evitar que se amontonen
+      el.style.transform = `translate(${startX}px, ${startY}px) rotate(${rot}deg)`;
+      
+      const particle = {
+        el: el,
+        x: startX,
+        y: startY,
+        // Si hay reducción de movimiento, la velocidad será 0
+        vx: prefersReduced ? 0 : (Math.random() - 0.5) * 0.8, 
+        vy: prefersReduced ? 0 : (Math.random() - 0.5) * 0.8,
+        rot: rot
+      };
+
+      field.appendChild(el);
+      particles.push(particle);
+    }
+  }
+
+  buildField();
+  window.addEventListener('resize', debounce(buildField, 200));
+
+  function debounce(fn, wait){
+    let t;
+    return function(){ clearTimeout(t); t = setTimeout(fn, wait); };
+  }
+
+  const RADIUS = 180;
+  let mouseX = -9999, mouseY = -9999;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    glow.style.opacity = '1';
+    glow.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+  });
+
+  window.addEventListener('mouseleave', () => {
+    glow.style.opacity = '0';
+    mouseX = -9999;
+    mouseY = -9999;
+  });
+
+  function animate(){
+    for(const p of particles){
+      // Movimiento natural
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Efecto bucle al salirse de la pantalla
+      if (p.x < -150) p.x = window.innerWidth + 150;
+      if (p.x > window.innerWidth + 150) p.x = -150;
+      if (p.y < -100) p.y = window.innerHeight + 100;
+      if (p.y > window.innerHeight + 100) p.y = -100;
+
+      let repelX = 0;
+      let repelY = 0;
+      let dist = Infinity;
+      let intensity = 0;
+
+      // Interacción con el cursor
+      if (mouseX !== -9999 && !prefersReduced) {
+        const dx = p.x - mouseX;
+        const dy = p.y - mouseY;
+        dist = Math.sqrt(dx*dx + dy*dy);
+
+        if (dist < RADIUS) {
+          intensity = 1 - dist / RADIUS;
+          // Se alejan del cursor
+          repelX = (dx / (dist || 1)) * intensity * 70;
+          repelY = (dy / (dist || 1)) * intensity * 70;
+        }
+      }
+
+      const scale = 1 + intensity * 0.4;
+      p.el.style.transform = `translate(${p.x + repelX}px, ${p.y + repelY}px) scale(${scale}) rotate(${p.rot}deg)`;
+
+      if (dist < RADIUS) {
+        p.el.style.color = intensity > 0.5 ? 'var(--mint)' : 'var(--coral)';
+        p.el.style.textShadow = `0 0 ${10*intensity}px currentColor`;
+        p.el.style.zIndex = 3;
+      } else {
+        p.el.style.color = 'var(--muted)';
+        p.el.style.textShadow = 'none';
+        p.el.style.zIndex = 0;
+      }
+    }
+    
+    requestAnimationFrame(animate);
+  }
+
+  requestAnimationFrame(animate);
+
+})();
+</script>
+</body>
+</html>
